@@ -6,7 +6,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json'],
   collectCoverageFrom: [
     'src/**/*.ts',
-    '!src/index.ts'
+    '!index.ts'
   ],
   verbose: true
 };

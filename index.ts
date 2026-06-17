@@ -1,12 +1,14 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits, REST, Routes, Events } from 'discord.js';
-import { timeCommand, addCommand, timestopCommand, unaddCommand, handleTimeCommand, handleTimestopCommand, handleUnaddCommand } from './commands/time';
-import { reportCommand, handleReportCommand, handleReportModal } from './commands/report';
-import { ssCommand, handleSsCommand, handleSsModal } from './commands/ss';
-import { upCommand, handleUpCommand, setStartTime } from './commands/up';
-import { handleReady } from './events/ready';
-import { handleInteractionCreate } from './events/interactionCreate';
-import { addAllowedRole } from './utils/storage';
+import { timeCommand, addCommand, timestopCommand, unaddCommand, handleTimeCommand, handleTimestopCommand, handleUnaddCommand } from './src/commands/time';
+import { reportCommand, handleReportCommand, handleReportModal } from './src/commands/report';
+import { ssCommand, handleSsCommand, handleSsModal } from './src/commands/ss';
+import { upCommand, handleUpCommand, setStartTime } from './src/commands/up';
+import { helpCommand, handleHelpCommand } from './src/commands/help';
+import { updateCommand, handleUpdateCommand } from './src/commands/update';
+import { handleReady } from './src/events/ready';
+import { handleInteractionCreate } from './src/events/interactionCreate';
+import { addAllowedRole } from './src/utils/storage';
 
 const TOKEN: string = process.env.DISCORD_TOKEN ?? '';
 const CLIENT_ID: string = process.env.CLIENT_ID ?? '';
@@ -35,7 +37,9 @@ const commands = [
   unaddCommand.toJSON(),
   reportCommand.toJSON(),
   ssCommand.toJSON(),
-  upCommand.toJSON()
+  upCommand.toJSON(),
+  helpCommand.toJSON(),
+  updateCommand.toJSON()
 ];
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
@@ -85,6 +89,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
       case 'up':
         await handleUpCommand(interaction);
         break;
+      case 'help':
+        await handleHelpCommand(interaction);
+        break;
+      case 'update':
+        await handleUpdateCommand(interaction);
+        break;
     }
     return;
   }
@@ -92,7 +102,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isModalSubmit()) {
     switch (interaction.customId) {
       case 'timeModal':
-        const { handleTimeModal } = require('./commands/time');
+        const { handleTimeModal } = require('./src/commands/time');
         await handleTimeModal(interaction);
         return;
       case 'reportModal':
