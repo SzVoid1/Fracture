@@ -1,9 +1,9 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, REST, Routes } from 'discord.js';
-import { timeCommand, addCommand, timestopCommand, unaddCommand } from './time';
-import { reportCommand } from './report';
-import { ssCommand } from './ss';
-import { upCommand } from './up';
-import { helpCommand } from './help';
+import { timeCommand, addCommand, timestopCommand, unaddCommand } from './time.js';
+import { reportCommand } from './report.js';
+import { ssCommand } from './ss.js';
+import { upCommand } from './up.js';
+import { helpCommand } from './help.js';
 
 export const updateCommand = new SlashCommandBuilder()
   .setName('update')

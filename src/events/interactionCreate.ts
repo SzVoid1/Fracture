@@ -1,5 +1,5 @@
 import { Interaction, GuildMember, EmbedBuilder } from 'discord.js';
-import { getAnnouncement, updateAnnouncement, removeAllowedRole } from '../utils/storage';
+import { getAnnouncement, updateAnnouncement, removeAllowedRole } from '../utils/storage.js';
 
 export async function handleInteractionCreate(interaction: Interaction): Promise<void> {
   // Unadd select menu

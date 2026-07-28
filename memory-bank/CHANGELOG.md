@@ -38,6 +38,7 @@
 - **%50 ve %75 bildirimleri**: Varolan duyuru mesajı güncelleniyor, ayrıca kısa ping mesajı atılıyor (yeni duyuru değil)
 - **Embed durum güncellemesi**: %50'de ⏰ turuncu, %75'te 🔔 koyu turuncu, süre dolunca 🚫 kırmızı
 
+
 ## [1.2.0] - 2026-06-10
 
 ### Eklenenler
@@ -46,3 +47,14 @@
 - `/up` komutu - Bot durumu (uptime, API gecikmesi, bot gecikmesi, sürüm bilgisi)
 - `data/cooldowns.json` - Cooldown takip sistemi
 - Owner DM entegrasyonu (ID: 1068171016603443202)
+
+## [1.3.0] - 2026-07-28
+
+### Değişenler
+- Node.js sürümü 20 → 26 olarak güncellendi
+- `@types/node` `^20.10.6` → `^26.0.0`
+- TypeScript hedefi ES2022 → ES2024
+- `.nvmrc` dosyası eklendi (`26`)
+- `package.json`'a `engines: { node: ">=26.0.0" }` tanımı eklendi
+
+> Bu sürümün tek odağı Node.js altyapı güncellemesidir. Yeni bir özellik eklenmemiştir.

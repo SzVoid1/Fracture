@@ -15,8 +15,8 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder
 } from 'discord.js';
-import { parseTimeInput } from '../utils/timeParser';
-import { getGuildSettings, addAnnouncement, getAnnouncement, removeAnnouncement } from '../utils/storage';
+import { parseTimeInput } from '../utils/timeParser.js';
+import { getGuildSettings, addAnnouncement, getAnnouncement, removeAnnouncement } from '../utils/storage.js';
 
 export const timeCommand = new SlashCommandBuilder()
   .setName('time')

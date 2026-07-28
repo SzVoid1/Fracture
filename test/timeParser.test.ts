@@ -1,4 +1,4 @@
-import { parseTimeInput, formatDuration, getTimeUntil } from '../src/utils/timeParser';
+import { parseTimeInput, formatDuration, getTimeUntil } from '../src/utils/timeParser.js';
 
 describe('timeParser - parseTimeInput', () => {
   beforeEach(() => {

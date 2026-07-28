@@ -1,10 +1,12 @@
 # Fracture Discord Bot - Sürüm Bilgisi
 
-## Mevcut Sürüm: 1.2.0 (Kararlı)
+## Mevcut Sürüm: 1.3.0 (Kararlı)
 
 ### Özet
 Zaman bazlı rol etiketleme botu. Belirli bir zaman, başlık, açıklama ve rol alarak duyuru oluşturur.
 Süre %50'sinde kanal pingi, %75'inde DM bildirimi gönderir. Ayrıca hata report, öneri ve bot durumu komutları içerir.
+
+> **Not:** v1.3.0 yalnızca Node.js 26 altyapı güncellemesidir, yeni özellik içermez.
 
 **Dil:** TypeScript · **Kütüphane:** Discord.js v14 · **Veri:** JSON (`data/`) · **Test:** Jest + ts-jest
 

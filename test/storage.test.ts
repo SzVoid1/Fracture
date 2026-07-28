@@ -10,7 +10,7 @@ import {
   setGuildSettings,
   addAllowedRole,
   removeAllowedRole
-} from '../src/utils/storage';
+} from '../src/utils/storage.js';
 
 jest.mock('fs');
 

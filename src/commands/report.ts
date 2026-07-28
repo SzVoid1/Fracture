@@ -8,7 +8,7 @@ import {
   ModalSubmitInteraction,
   EmbedBuilder
 } from 'discord.js';
-import { checkCooldown, setCooldown } from '../utils/storage';
+import { checkCooldown, setCooldown } from '../utils/storage.js';
 
 const OWNER_ID = '1068171016603443202';
 const REPORT_COOLDOWN = 15 * 60 * 1000;

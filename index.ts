@@ -1,14 +1,14 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits, REST, Routes, Events } from 'discord.js';
-import { timeCommand, addCommand, timestopCommand, unaddCommand, handleTimeCommand, handleTimestopCommand, handleUnaddCommand } from './src/commands/time';
-import { reportCommand, handleReportCommand, handleReportModal } from './src/commands/report';
-import { ssCommand, handleSsCommand, handleSsModal } from './src/commands/ss';
-import { upCommand, handleUpCommand, setStartTime } from './src/commands/up';
-import { helpCommand, handleHelpCommand } from './src/commands/help';
-import { updateCommand, handleUpdateCommand } from './src/commands/update';
-import { handleReady } from './src/events/ready';
-import { handleInteractionCreate } from './src/events/interactionCreate';
-import { addAllowedRole } from './src/utils/storage';
+import { timeCommand, addCommand, timestopCommand, unaddCommand, handleTimeCommand, handleTimestopCommand, handleUnaddCommand } from './src/commands/time.js';
+import { reportCommand, handleReportCommand, handleReportModal } from './src/commands/report.js';
+import { ssCommand, handleSsCommand, handleSsModal } from './src/commands/ss.js';
+import { upCommand, handleUpCommand, setStartTime } from './src/commands/up.js';
+import { helpCommand, handleHelpCommand } from './src/commands/help.js';
+import { updateCommand, handleUpdateCommand } from './src/commands/update.js';
+import { handleReady } from './src/events/ready.js';
+import { handleInteractionCreate } from './src/events/interactionCreate.js';
+import { addAllowedRole } from './src/utils/storage.js';
 
 const TOKEN: string = process.env.DISCORD_TOKEN ?? '';
 const CLIENT_ID: string = process.env.CLIENT_ID ?? '';
@@ -102,7 +102,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isModalSubmit()) {
     switch (interaction.customId) {
       case 'timeModal':
-        const { handleTimeModal } = require('./src/commands/time');
+        const { handleTimeModal } = await import('./src/commands/time.js');
         await handleTimeModal(interaction);
         return;
       case 'reportModal':
