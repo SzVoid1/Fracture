@@ -1,6 +1,6 @@
+import type { ChatInputCommandInteraction } from 'discord.js';
 import {
   SlashCommandBuilder,
-  ChatInputCommandInteraction,
   EmbedBuilder,
   version as djsVersion
 } from 'discord.js';

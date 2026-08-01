@@ -1,9 +1,10 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, REST, Routes } from 'discord.js';
-import { timeCommand, addCommand, timestopCommand, unaddCommand } from './time.js';
-import { reportCommand } from './report.js';
-import { ssCommand } from './ss.js';
-import { upCommand } from './up.js';
-import { helpCommand } from './help.js';
+import type { ChatInputCommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, REST, Routes } from 'discord.js';
+import { timeCommand, addCommand, timestopCommand, unaddCommand } from './time.ts';
+import { reportCommand } from './report.ts';
+import { ssCommand } from './ss.ts';
+import { upCommand } from './up.ts';
+import { helpCommand } from './help.ts';
 
 export const updateCommand = new SlashCommandBuilder()
   .setName('update')

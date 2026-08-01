@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const DATA_DIR = path.join(__dirname, '..', '..', 'data');
+const DATA_DIR = path.join(process.cwd(), 'data');
 const ANNOUNCEMENTS_FILE = path.join(DATA_DIR, 'announcements.json');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const COOLDOWNS_FILE = path.join(DATA_DIR, 'cooldowns.json');

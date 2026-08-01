@@ -1,5 +1,6 @@
-import { Client, ActivityType } from "discord.js";
-import { startScheduler } from "../utils/scheduler.js";
+import type { Client } from "discord.js";
+import { ActivityType } from "discord.js";
+import { startScheduler } from "../utils/scheduler.ts";
 
 export async function handleReady(client: Client<true>): Promise<void> {
   console.log(`[BOT] ${client.user.tag} olarak giriş yapıldı!`);

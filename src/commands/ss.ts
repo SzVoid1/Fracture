@@ -1,11 +1,10 @@
+import type { ChatInputCommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import {
   SlashCommandBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
-  ChatInputCommandInteraction,
-  ModalSubmitInteraction,
   EmbedBuilder
 } from 'discord.js';
 

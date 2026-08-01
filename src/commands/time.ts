@@ -1,12 +1,10 @@
+import type { CommandInteraction, ChatInputCommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import {
   SlashCommandBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
-  CommandInteraction,
-  ChatInputCommandInteraction,
-  ModalSubmitInteraction,
   ChannelType,
   EmbedBuilder,
   ButtonBuilder,
@@ -15,8 +13,8 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder
 } from 'discord.js';
-import { parseTimeInput } from '../utils/timeParser.js';
-import { getGuildSettings, addAnnouncement, getAnnouncement, removeAnnouncement } from '../utils/storage.js';
+import { parseTimeInput } from '../utils/timeParser.ts';
+import { getGuildSettings, addAnnouncement, getAnnouncement, removeAnnouncement } from '../utils/storage.ts';
 
 export const timeCommand = new SlashCommandBuilder()
   .setName('time')

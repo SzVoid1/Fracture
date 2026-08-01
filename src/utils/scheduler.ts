@@ -1,6 +1,7 @@
-import { Client, TextChannel, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ActivityType } from 'discord.js';
-import { getAnnouncements, updateAnnouncement, removeAnnouncement } from './storage.js';
-import { formatDuration, getTimeUntil } from './timeParser.js';
+import type { Client } from 'discord.js';
+import { TextChannel, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ActivityType } from 'discord.js';
+import { getAnnouncements, updateAnnouncement, removeAnnouncement } from './storage.ts';
+import { formatDuration, getTimeUntil } from './timeParser.ts';
 
 const CHECK_INTERVAL = 30 * 1000;
 const DELAY_THRESHOLD = CHECK_INTERVAL * 3;
