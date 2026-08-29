@@ -50,7 +50,7 @@ export async function handleSsModal(interaction: ModalSubmitInteraction): Promis
 
     await interaction.reply({
       content: '✅ İstek/öneriniz başarıyla iletildi! Teşekkürler.',
-      ephemeral: true
+      flags: 64
     });
 
     console.log(`[SS] Gönderildi: ${interaction.user.tag} - ${desc.slice(0, 50)}...`);
@@ -58,7 +58,7 @@ export async function handleSsModal(interaction: ModalSubmitInteraction): Promis
     console.error('[SS MODAL] Hata:', error);
     await interaction.reply({
       content: '❌ Gönderilirken bir hata oluştu.',
-      ephemeral: true
+      flags: 64
     });
   }
 }

@@ -2,6 +2,7 @@ import type { Client } from 'discord.js';
 import { TextChannel, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ActivityType } from 'discord.js';
 import { getAnnouncements, updateAnnouncement, removeAnnouncement } from './storage.ts';
 import { formatDuration, getTimeUntil } from './timeParser.ts';
+import { buildAnnouncementEmbed, buildAnnouncementButtons } from './announcementEmbed.ts';
 
 const CHECK_INTERVAL = 30 * 1000;
 const DELAY_THRESHOLD = CHECK_INTERVAL * 3;
@@ -30,32 +31,6 @@ export function stopScheduler(): void {
   }
 }
 
-function getBaseEmbed(announcement: any): EmbedBuilder {
-  return new EmbedBuilder()
-    .setDescription(announcement.description)
-    .addFields(
-      { name: 'Bitiş Süresi', value: `<t:${Math.floor(announcement.expiresAt / 1000)}:F>`, inline: true },
-      { name: 'Kalan Süre', value: `<t:${Math.floor(announcement.expiresAt / 1000)}:R>`, inline: true },
-      { name: 'Hedef Rol', value: `<@&${announcement.roleId}>`, inline: true }
-    )
-    .setFooter({ text: `ID: ${announcement.id}` })
-    .setTimestamp();
-}
-
-function getButtons(announcement: any): ActionRowBuilder<ButtonBuilder> {
-  return new ActionRowBuilder<ButtonBuilder>()
-    .addComponents(
-      new ButtonBuilder()
-        .setCustomId(`seen_${announcement.id}`)
-        .setEmoji('👁️')
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId(`list_${announcement.id}`)
-        .setEmoji('📜')
-        .setStyle(ButtonStyle.Secondary)
-    );
-}
-
 async function editAnnouncementMessage(client: Client, announcement: any, embed: EmbedBuilder, keepButtons: boolean): Promise<void> {
   try {
     const channel = await client.channels.fetch(announcement.channelId);
@@ -64,7 +39,7 @@ async function editAnnouncementMessage(client: Client, announcement: any, embed:
     const msg = await channel.messages.fetch(announcement.messageId);
     await msg.edit({
       embeds: [embed],
-      components: keepButtons ? [getButtons(announcement)] : []
+      components: keepButtons ? [buildAnnouncementButtons(announcement.id, announcement.seenBy?.length || 0)] : []
     });
   } catch { }
 }
@@ -73,10 +48,6 @@ function getDelayNotice(threshold: number, elapsed: number): string {
   return elapsed > threshold + DELAY_THRESHOLD
     ? '\n\n⚠️ **Bot yeniden başlatıldığı için bu bildirim gecikmeli gönderilmiştir. Kusura bakmayın.**'
     : '';
-}
-
-function getPct(pct: number): number {
-  return Math.round(pct * 100);
 }
 
 async function checkAnnouncements(client: Client): Promise<void> {
@@ -93,15 +64,7 @@ async function checkAnnouncements(client: Client): Promise<void> {
     if (timeLeft <= 0) {
       console.log(`[SCHEDULER] Duyuru süresi doldu: ${ann.id}`);
 
-      const embed = new EmbedBuilder()
-        .setColor(0xFF0000)
-        .setTitle(`🚫 ${ann.title} - Süre Doldu!`)
-        .setDescription(`${ann.description}\n\n⏳ **Bu duyurunun süresi dolmuştur.**`)
-        .addFields(
-          { name: 'Planlanan Bitiş', value: `<t:${Math.floor(ann.expiresAt / 1000)}:F>`, inline: true }
-        )
-        .setTimestamp();
-
+      const embed = buildAnnouncementEmbed(ann, 'expired');
       await editAnnouncementMessage(client, ann, embed, false);
 
       const channel = await client.channels.fetch(ann.channelId);
@@ -118,11 +81,9 @@ async function checkAnnouncements(client: Client): Promise<void> {
       const delay = getDelayNotice(threshold50, elapsed);
       console.log(`[SCHEDULER] %50 kanal bildirimi: ${ann.id}${delay ? ' (gecikmeli)' : ''}`);
 
-      const embed = getBaseEmbed(ann)
-        .setColor(0xFFA500)
-        .setTitle(`⏰ ${ann.title} - %${getPct(0.50)}`)
-        .setDescription(ann.description + delay)
-        .spliceFields(2, 1, { name: 'Durum', value: `⚡ **%${getPct(0.50)} tamamlandı!**`, inline: true });
+      // Compact embed half status, delay notice description'a ekle
+      const embed = buildAnnouncementEmbed(ann, 'half');
+      if (delay) embed.setDescription((embed.data.description || '') + delay);
 
       await editAnnouncementMessage(client, ann, embed, true);
 
@@ -139,11 +100,8 @@ async function checkAnnouncements(client: Client): Promise<void> {
       const delay = getDelayNotice(threshold75, elapsed);
       console.log(`[SCHEDULER] %75 DM bildirimi: ${ann.id}${delay ? ' (gecikmeli)' : ''}`);
 
-      const embed = getBaseEmbed(ann)
-        .setColor(0xE67E22)
-        .setTitle(`🔔 ${ann.title} - %${getPct(0.75)}`)
-        .setDescription(ann.description + delay)
-        .spliceFields(2, 1, { name: 'Durum', value: `🔴 **%${getPct(0.75)} tamamlandı!**`, inline: true });
+      const embed = buildAnnouncementEmbed(ann, 'critical');
+      if (delay) embed.setDescription((embed.data.description || '') + delay);
 
       await editAnnouncementMessage(client, ann, embed, true);
       await sendFinalDMs(client, ann, timeLeft, delay);

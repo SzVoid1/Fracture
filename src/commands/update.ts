@@ -35,7 +35,7 @@ export async function handleUpdateCommand(interaction: ChatInputCommandInteracti
   const GUILD_ID = process.env.GUILD_ID;
 
   if (!TOKEN || !CLIENT_ID) {
-    await interaction.reply({ content: '❌ Token veya Client ID bulunamadı.', ephemeral: true });
+    await interaction.reply({ content: '❌ Token veya Client ID bulunamadı.', flags: 64 });
     return;
   }
 
@@ -44,18 +44,18 @@ export async function handleUpdateCommand(interaction: ChatInputCommandInteracti
 
   if (commandName) {
     if (commandName === 'update') {
-      await interaction.reply({ content: '❌ `/update` komutu kendi kendine güncellenemez. Tümünü güncellemek için komut adı belirtmeden `/update` kullanın.', ephemeral: true });
+      await interaction.reply({ content: '❌ `/update` komutu kendi kendine güncellenemez. Tümünü güncellemek için komut adı belirtmeden `/update` kullanın.', flags: 64 });
       return;
     }
 
     const builder = commandMap[commandName];
     if (!builder) {
-      await interaction.reply({ content: `❌ \`${commandName}\` adlı bir komut bulunamadı. Mevcut komutlar: ${Object.keys(commandMap).join(', ')}`, ephemeral: true });
+      await interaction.reply({ content: `❌ \`${commandName}\` adlı bir komut bulunamadı. Mevcut komutlar: ${Object.keys(commandMap).join(', ')}`, flags: 64 });
       return;
     }
 
     try {
-      await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ flags: 64 });
 
       const existingCommands = await rest.get(guildRoute) as any[];
       const existing = existingCommands.find((c: any) => c.name === commandName);
@@ -91,7 +91,7 @@ export async function handleUpdateCommand(interaction: ChatInputCommandInteracti
   ];
 
   try {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: 64 });
     await rest.put(guildRoute, { body: allCommands });
     await interaction.editReply({ content: '✅ Tüm komutlar başarıyla yeniden derlendi!' });
     console.log(`[UPDATE] Tüm komutlar yeniden derlendi - ${interaction.user.tag}`);

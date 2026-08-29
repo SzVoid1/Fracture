@@ -59,6 +59,16 @@ async function registerCommands(): Promise<void> {
   }
 }
 
+// ───── Global Error Handlers (ECONNRESET / WS çökmesini engeller) ─────
+client.on(Events.Error, (error) => console.error('[CLIENT ERROR]', error));
+client.on(Events.ShardError, (error) => console.error('[SHARD ERROR]', error));
+client.on(Events.ShardDisconnect, (event, shardId) => console.warn(`[SHARD DISCONNECT] shard=${shardId}`, event?.code, event?.reason));
+(client as any).on('error', (error: any) => console.error('[CLIENT RAW ERROR]', error));
+client.rest.on('rateLimited', (info) => console.warn('[RATE LIMITED]', info));
+
+process.on('unhandledRejection', (reason) => console.error('[UNHANDLED REJECTION]', reason));
+process.on('uncaughtException', (err) => console.error('[UNCAUGHT EXCEPTION]', err));
+
 client.once(Events.ClientReady, async (c) => {
   setStartTime();
   await registerCommands();
@@ -66,6 +76,7 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  try {
   if (interaction.isChatInputCommand()) {
     switch (interaction.commandName) {
       case 'time':
@@ -101,10 +112,21 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   if (interaction.isModalSubmit()) {
     switch (interaction.customId) {
-      case 'timeModal':
+      case 'timeModal': {
         const { handleTimeModal } = await import('./src/commands/time.ts');
         await handleTimeModal(interaction);
         return;
+      }
+      case 'wizard_duration_modal': {
+        const { handleWizardDurationModal } = await import('./src/commands/time.ts');
+        await handleWizardDurationModal(interaction);
+        return;
+      }
+      case 'wizard_content_modal': {
+        const { handleWizardContentModal } = await import('./src/commands/time.ts');
+        await handleWizardContentModal(interaction);
+        return;
+      }
       case 'reportModal':
         await handleReportModal(interaction);
         return;
@@ -115,17 +137,27 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   await handleInteractionCreate(interaction);
+  } catch (err) {
+    console.error('[INTERACTION ERROR]', err);
+    try {
+      if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
+        await interaction.reply({ content: '❌ Bir hata oluştu.', flags: 64 });
+      } else if (interaction.isRepliable() && interaction.deferred) {
+        await (interaction as any).editReply({ content: '❌ Bir hata oluştu.' });
+      }
+    } catch {}
+  }
 });
 
 async function handleAddCommand(interaction: any): Promise<void> {
   if (!interaction.member?.permissions?.has(0x0000000000000008n)) {
-    await interaction.reply({ content: '❌ Bu komutu kullanma yetkiniz yok.', ephemeral: true });
+    await interaction.reply({ content: '❌ Bu komutu kullanma yetkiniz yok.', flags: 64 });
     return;
   }
 
   const role = interaction.options.getRole('rol');
   if (!role) {
-    await interaction.reply({ content: '❌ Geçerli bir rol seçin.', ephemeral: true });
+    await interaction.reply({ content: '❌ Geçerli bir rol seçin.', flags: 64 });
     return;
   }
 
@@ -133,13 +165,33 @@ async function handleAddCommand(interaction: any): Promise<void> {
 
   await interaction.reply({
     content: `✅ \`/time\` komutunu kullanma izni **${role.name}** rolüne verildi!`,
-    ephemeral: true
+    flags: 64
   });
 
   console.log(`[ADD] Rol eklendi: ${role.name} (${role.id}) - ${interaction.user.tag}`);
 }
 
-client.login(TOKEN).catch((error) => {
-  console.error('[BOT] Giriş hatası:', error);
-  process.exit(1);
-});
+async function loginWithRetry(retries = 5, delayMs = 5000): Promise<void> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await client.login(TOKEN);
+      return;
+    } catch (error: any) {
+      const isNetwork = error?.code === 'ECONNRESET' || error?.code === 'ENOTFOUND' || error?.code === 'ETIMEDOUT' || error?.message?.includes('ECONNRESET');
+      console.error(`[BOT] Giriş hatası (deneme ${attempt}/${retries}):`, error?.code || error?.message || error);
+      if (!isNetwork || attempt === retries) {
+        console.error('[BOT] Tüm giriş denemeleri başarısız. 2sn sonra çıkış.');
+        setTimeout(() => process.exit(1), 2000);
+        return;
+      }
+      console.log(`[BOT] ${delayMs / 1000}s sonra yeniden deneniyor...`);
+      await new Promise(r => setTimeout(r, delayMs));
+      delayMs *= 1.5;
+    }
+  }
+}
+
+// TLS / ağ dalgalanmasında çökme yerine yeniden bağlanmayı dene
+client.on(Events.ShardReconnecting, () => console.log('[SHARD] Yeniden bağlanılıyor...'));
+
+loginWithRetry();
