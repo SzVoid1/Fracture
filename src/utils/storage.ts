@@ -5,6 +5,7 @@ const DATA_DIR = path.join(process.cwd(), 'data');
 const ANNOUNCEMENTS_FILE = path.join(DATA_DIR, 'announcements.json');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const COOLDOWNS_FILE = path.join(DATA_DIR, 'cooldowns.json');
+const INTRO_FILE = path.join(DATA_DIR, 'introDismissed.json');
 
 interface Announcement {
   id: string;
@@ -20,6 +21,8 @@ interface Announcement {
   seenBy: string[];
   halfwayNotified: boolean;
   finalDmNotified: boolean;
+  authorId?: string;
+  authorTag?: string;
 }
 
 interface Settings {
@@ -52,12 +55,51 @@ function writeJson<T>(filePath: string, data: T): void {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
+let announcementsCache: Announcement[] | null = null;
+let announcementsCacheAt = 0;
+const CACHE_TTL = 5000;
+
+function migrateAnnouncements(list: Announcement[]): Announcement[] {
+  let mutated = false;
+  for (const ann of list) {
+    if (!ann.seenBy) { (ann as any).seenBy = []; mutated = true; }
+    if (ann.halfwayNotified === undefined) { ann.halfwayNotified = false; mutated = true; }
+    if (ann.finalDmNotified === undefined) { ann.finalDmNotified = false; mutated = true; }
+    if (!ann.totalMs || ann.totalMs <= 0) { ann.totalMs = Math.max(1000, ann.expiresAt - ann.createdAt); mutated = true; }
+    if (!ann.authorId) { ann.authorId = 'unknown'; mutated = true; }
+    if (!ann.authorTag) { ann.authorTag = 'Bilinmeyen'; mutated = true; }
+    // Ensure IDs are strings
+    if (typeof ann.id !== 'string') { (ann as any).id = String(ann.id); mutated = true; }
+  }
+  if (mutated) {
+    writeJson(ANNOUNCEMENTS_FILE, list);
+  }
+  return list;
+}
+
 export function getAnnouncements(): Announcement[] {
-  return readJson<Announcement[]>(ANNOUNCEMENTS_FILE, []);
+  const now = Date.now();
+  if (announcementsCache && (now - announcementsCacheAt) < CACHE_TTL) {
+    return [...announcementsCache];
+  }
+  const list = readJson<Announcement[]>(ANNOUNCEMENTS_FILE, []);
+  const migrated = migrateAnnouncements(list);
+  announcementsCache = [...migrated];
+  announcementsCacheAt = now;
+  return [...migrated];
+}
+
+function invalidateAnnouncementsCache(): void {
+  announcementsCache = null;
+}
+
+export function __clearAnnouncementsCache(): void {
+  invalidateAnnouncementsCache();
 }
 
 export function saveAnnouncements(announcements: Announcement[]): void {
   writeJson(ANNOUNCEMENTS_FILE, announcements);
+  invalidateAnnouncementsCache();
 }
 
 export function addAnnouncement(announcement: Announcement): void {
@@ -164,4 +206,21 @@ export function checkCooldown(userId: string): { onCooldown: boolean; remainingM
   }
 
   return { onCooldown: true, remainingMs: remaining };
+}
+
+// Intro dismissed (one-time wizard info)
+export function getIntroDismissed(): string[] {
+  return readJson<string[]>(INTRO_FILE, []);
+}
+
+export function isIntroDismissed(userId: string): boolean {
+  return getIntroDismissed().includes(userId);
+}
+
+export function dismissIntro(userId: string): void {
+  const list = getIntroDismissed();
+  if (!list.includes(userId)) {
+    list.push(userId);
+    writeJson(INTRO_FILE, list);
+  }
 }

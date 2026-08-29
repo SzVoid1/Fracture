@@ -13,7 +13,7 @@ export async function handleHelpCommand(interaction: ChatInputCommandInteraction
     .addFields(
       {
         name: '📢 /time',
-        value: 'Zaman bazlı duyuru oluşturur. Modal arayüzü ile başlık, açıklama, süre, kanal ve rol belirlenir.\n**Örnek:** `/time` → modal açılır\n**Süre formatları:** `1h 30m`, `5d` (dakika), `2day` (gün), `2024-12-31 23:59`',
+        value: 'Modern sihirbaz ile duyuru oluşturur. Kanal/Rol menüden seçilir, süre `GG:HH:MM:SS` formatında girilir.\n**Akış:** `/time` → Kılavuz (ilk kez) → Kanal → Rol → Süre → Başlık/Açıklama → Önizleme → Onayla\n**Süre örnekleri:** `30`=30sn, `2:00`=2dk, `2:0:0`=2sa, `00:02:00:00`=2sa, `01:20:00:00`=1gün 20sa\n**Not:** `00`/`0` es geçilir, `25` saat → `1g 1sa` normalize olur',
         inline: false
       },
       {
@@ -55,6 +55,6 @@ export async function handleHelpCommand(interaction: ChatInputCommandInteraction
     .setFooter({ text: 'Fracture Bot v1.2.0' })
     .setTimestamp();
 
-  await interaction.reply({ embeds: [embed], ephemeral: true });
+  await interaction.reply({ embeds: [embed], flags: 64 });
   console.log(`[HELP] Kullanıldı: ${interaction.user.tag}`);
 }

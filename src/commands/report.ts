@@ -22,7 +22,7 @@ export async function handleReportCommand(interaction: ChatInputCommandInteracti
     const mins = Math.ceil(cooldown.remainingMs / 60000);
     await interaction.reply({
       content: `⏳ Bir sonraki reportu **${mins} dakika** sonra gönderebilirsiniz.`,
-      ephemeral: true
+      flags: 64
     });
     return;
   }
@@ -92,7 +92,7 @@ export async function handleReportModal(interaction: ModalSubmitInteraction): Pr
 
     await interaction.reply({
       content: '✅ Report başarıyla gönderildi! En kısa sürede incelenecektir.',
-      ephemeral: true
+      flags: 64
     });
 
     console.log(`[REPORT] Gönderildi: ${interaction.user.tag} - ${desc.slice(0, 50)}...`);
@@ -100,7 +100,7 @@ export async function handleReportModal(interaction: ModalSubmitInteraction): Pr
     console.error('[REPORT MODAL] Hata:', error);
     await interaction.reply({
       content: '❌ Report gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
-      ephemeral: true
+      flags: 64
     });
   }
 }
