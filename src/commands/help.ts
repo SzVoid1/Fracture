@@ -32,6 +32,11 @@ export async function handleHelpCommand(interaction: ChatInputCommandInteraction
         inline: false
       },
       {
+        name: '🟢 /kick',
+        value: 'Kick kanalını izler ve Discord\'a duyuru atar. Yayın başlayınca yeni mesaj atar, yayın bitince aynı mesajı günceller. (Sadece Admin)\n**Alt komutlar:** `slug` (Kick kanalı) · `kanal` (Discord duyuru kanalı) · `ping` (rol/@everyone/yok) · `mesaj` (altındaki ek mesaj) · `test` · `durum` · `kaldir`\n**Örnek:** `/kick slug xqc` → `/kick kanal #duyuru` → `/kick mesaj tur:canli icerik:b yayına başladık!`\n**Not:** Yayın başlığı her zaman en üstte görünür, `mesaj` sadece altındaki ek metni değiştirir. Varsayılana dönmek için `/kick mesaj tur:canli` (metin boş).',
+        inline: false
+      },
+      {
         name: '🔄 /update [komut]',
         value: 'Komutları yeniden derler. Belirli bir komut adı verilirse sadece o komut güncellenir, boş bırakılırsa tüm komutlar yeniden yüklenir. (Sadece Admin)\n**Örnek:** `/update` (tümü) veya `/update komut:time`',
         inline: false

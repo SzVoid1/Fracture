@@ -5,6 +5,7 @@ import { reportCommand } from './report.ts';
 import { ssCommand } from './ss.ts';
 import { upCommand } from './up.ts';
 import { helpCommand } from './help.ts';
+import { kickCommand } from './kick.ts';
 
 export const updateCommand = new SlashCommandBuilder()
   .setName('update')
@@ -26,6 +27,7 @@ const commandMap: Record<string, { toJSON(): any }> = {
   ss: ssCommand,
   up: upCommand,
   help: helpCommand,
+  kick: kickCommand,
 };
 
 export async function handleUpdateCommand(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -88,6 +90,7 @@ export async function handleUpdateCommand(interaction: ChatInputCommandInteracti
     upCommand.toJSON(),
     helpCommand.toJSON(),
     updateCommand.toJSON(),
+    kickCommand.toJSON(),
   ];
 
   try {

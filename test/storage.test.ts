@@ -264,3 +264,85 @@ describe('Storage - Intro Dismissed', () => {
     expect(getIntroDismissed()).toContain('userX');
   });
 });
+describe('Storage - Kick Settings', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  function read(): any[] {
+    const written = mockedFs.writeFileSync.mock.calls.at(-1)![1] as string;
+    return JSON.parse(written);
+  }
+
+  test('updateKickSettings alanları yazar', async () => {
+    const { updateKickSettings } = await import('../src/utils/storage.ts');
+    mockedFs.existsSync.mockReturnValue(true);
+    mockedFs.readFileSync.mockReturnValue('[]');
+
+    updateKickSettings('g1', { kickSlug: 'xqc', kickChannelId: 'c1' });
+
+    const saved = read();
+    expect(saved[0].kickSlug).toBe('xqc');
+    expect(saved[0].kickChannelId).toBe('c1');
+  });
+
+  test('null değer alanı SİLER — "varsayılana dön" regresyon testi', async () => {
+    const { updateKickSettings } = await import('../src/utils/storage.ts');
+    mockedFs.existsSync.mockReturnValue(true);
+    mockedFs.readFileSync.mockReturnValue(JSON.stringify([
+      { guildId: 'g1', announcementChannelId: '', allowedRoles: [], kickEndedText: 'eski özel metin' }
+    ]));
+
+    updateKickSettings('g1', { kickEndedText: null });
+
+    const saved = read();
+    expect(saved[0]).not.toHaveProperty('kickEndedText');
+  });
+
+  test('undefined değer de alanı SİLER', async () => {
+    const { updateKickSettings } = await import('../src/utils/storage.ts');
+    mockedFs.existsSync.mockReturnValue(true);
+    mockedFs.readFileSync.mockReturnValue(JSON.stringify([
+      { guildId: 'g1', announcementChannelId: '', allowedRoles: [], kickLiveText: 'eski' }
+    ]));
+
+    updateKickSettings('g1', { kickLiveText: undefined });
+
+    expect(read()[0]).not.toHaveProperty('kickLiveText');
+  });
+
+  test('ping modu değişince eski rol id silinir', async () => {
+    const { updateKickSettings } = await import('../src/utils/storage.ts');
+    mockedFs.existsSync.mockReturnValue(true);
+    mockedFs.readFileSync.mockReturnValue(JSON.stringify([
+      { guildId: 'g1', announcementChannelId: '', allowedRoles: [], kickPingType: 'role', kickPingRoleId: 'r1' }
+    ]));
+
+    updateKickSettings('g1', { kickPingType: 'everyone', kickPingRoleId: null });
+
+    const saved = read();
+    expect(saved[0].kickPingType).toBe('everyone');
+    expect(saved[0]).not.toHaveProperty('kickPingRoleId');
+  });
+
+  test('clearKickSettings tüm kick alanlarını siler', async () => {
+    const { clearKickSettings } = await import('../src/utils/storage.ts');
+    mockedFs.existsSync.mockReturnValue(true);
+    mockedFs.readFileSync.mockReturnValue(JSON.stringify([
+      {
+        guildId: 'g1', announcementChannelId: '', allowedRoles: ['r0'],
+        kickSlug: 'xqc', kickChannelId: 'c1', kickPingType: 'role', kickPingRoleId: 'r1',
+        kickLiveText: 'a', kickEndedText: 'b'
+      }
+    ]));
+
+    clearKickSettings('g1');
+
+    const saved = read()[0];
+    expect(saved.kickSlug).toBeUndefined();
+    expect(saved.kickChannelId).toBeUndefined();
+    expect(saved.kickPingType).toBeUndefined();
+    expect(saved.kickPingRoleId).toBeUndefined();
+    expect(saved.kickLiveText).toBeUndefined();
+    expect(saved.kickEndedText).toBeUndefined();
+    expect(saved.allowedRoles).toEqual(['r0']);
+  });
+});

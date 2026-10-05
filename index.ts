@@ -6,6 +6,7 @@ import { ssCommand, handleSsCommand, handleSsModal } from './src/commands/ss.ts'
 import { upCommand, handleUpCommand, setStartTime } from './src/commands/up.ts';
 import { helpCommand, handleHelpCommand } from './src/commands/help.ts';
 import { updateCommand, handleUpdateCommand } from './src/commands/update.ts';
+import { kickCommand, handleKickCommand } from './src/commands/kick.ts';
 import { handleReady } from './src/events/ready.ts';
 import { handleInteractionCreate } from './src/events/interactionCreate.ts';
 import { addAllowedRole } from './src/utils/storage.ts';
@@ -39,7 +40,8 @@ const commands = [
   ssCommand.toJSON(),
   upCommand.toJSON(),
   helpCommand.toJSON(),
-  updateCommand.toJSON()
+  updateCommand.toJSON(),
+  kickCommand.toJSON()
 ];
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
@@ -105,6 +107,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         break;
       case 'update':
         await handleUpdateCommand(interaction);
+        break;
+      case 'kick':
+        await handleKickCommand(interaction);
         break;
     }
     return;
