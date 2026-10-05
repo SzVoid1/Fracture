@@ -25,10 +25,18 @@ interface Announcement {
   authorTag?: string;
 }
 
-interface Settings {
+export type KickPingType = 'none' | 'role' | 'everyone';
+
+export interface Settings {
   guildId: string;
   announcementChannelId: string;
   allowedRoles: string[];
+  kickSlug?: string;
+  kickChannelId?: string;
+  kickPingType?: KickPingType;
+  kickPingRoleId?: string;
+  kickLiveText?: string;
+  kickEndedText?: string;
 }
 
 function ensureDataDir(): void {
@@ -150,6 +158,47 @@ export function setGuildSettings(settings: Settings): void {
     all.push(settings);
   }
   saveSettings(all);
+}
+
+export type KickSettingsField =
+  | 'kickSlug'
+  | 'kickChannelId'
+  | 'kickPingType'
+  | 'kickPingRoleId'
+  | 'kickLiveText'
+  | 'kickEndedText';
+
+/**
+ * Patch değeri `null`/`undefined` ise ilgili alan **silinir**.
+ * Önceden `undefined` sessizce atlanıyordu; bu yüzden "varsayılana dön" işlemi
+ * eski özel metni silemiyordu.
+ */
+export type KickSettingsPatch = Partial<Record<KickSettingsField, string | KickPingType | null>>;
+
+export function updateKickSettings(guildId: string, patch: KickSettingsPatch): Settings {
+  const settings: Settings = getGuildSettings(guildId) || { guildId, announcementChannelId: '', allowedRoles: [] };
+  const target = settings as unknown as Record<string, unknown>;
+  for (const [key, value] of Object.entries(patch)) {
+    if (value === null || value === undefined) {
+      delete target[key];
+    } else {
+      target[key] = value;
+    }
+  }
+  setGuildSettings(settings);
+  return settings;
+}
+
+export function clearKickSettings(guildId: string): void {
+  const settings = getGuildSettings(guildId);
+  if (!settings) return;
+  delete settings.kickSlug;
+  delete settings.kickChannelId;
+  delete settings.kickPingType;
+  delete settings.kickPingRoleId;
+  delete settings.kickLiveText;
+  delete settings.kickEndedText;
+  setGuildSettings(settings);
 }
 
 export function addAllowedRole(guildId: string, roleId: string): void {

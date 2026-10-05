@@ -1,6 +1,39 @@
+# ───── Bağımlılıklar & derleme çıktısı ─────
 node_modules/
 dist/
+*.tsbuildinfo
+
+# ───── Çalışma zamanı verisi (otomatik üretilir) ─────
 data/
-.env
-.env.fv
 *.log
+
+# ───── Gizli dosyalar ─────
+# Tüm .env varyantları: .env, .env.fv, .env.local, .env.production ...
+# Kick client secret da bu dosyada tutulduğu için pattern geniş tutuldu.
+.env*
+
+# ───── Test çıktısı ─────
+coverage/
+.nyc_output/
+
+# ───── Editör / IDE ─────
+.vscode/
+.idea/
+.eslintcache
+*.swp
+*.swo
+*~
+*.bak
+
+# ───── OS dosyaları ─────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ───── Kick özel görselleri (assets/kick/README.md takipte kalır) ─────
+# Kişisel marka görselleri; repo'ya binary girmesin. Silmek isterseniz:
+#   git clean -fdx   (Dikkat: .env'i de siler!)
+assets/kick/*.png
+assets/kick/*.jpg
+assets/kick/*.jpeg
+assets/kick/*.webp
